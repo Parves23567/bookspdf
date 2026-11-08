@@ -1,0 +1,38 @@
+{
+  "name": "আমার বাংলা লাইব্রেরি - ডিজিটাল PDF রিডার",
+  "short_name": "বাংলা লাইব্রেরি",
+  "description": "আধুনিক, সুন্দর ও দ্রুতগতির বাংলা ডিজিটাল লাইব্রেরি ও PDF Reader App",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbfbf8",
+  "theme_color": "#0f3a2f",
+  "categories": ["books", "education", "lifestyle"],
+  "lang": "bn",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -70,12 +70,74 @@ export default function App() {
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
+    // বেস হিস্ট্রি স্টেট ইনিট
+    if (!window.history.state) {
+      window.history.replaceState({ page: 'home' }, '');
+    }
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
   }, []);
+
+  // মোবাইল ব্যাক বাটন / ব্যাক সোয়াইপ / popstate হ্যান্ডলিং (অ্যাপ থেকে বের হওয়া রোধ)
+  useEffect(() => {
+    const handlePopState = (e) => {
+      // ১. যদি সাইডবার খোলা থাকে তা বন্ধ করুন
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+        return;
+      }
+      // ২. যদি কোনো মোডাল খোলা থাকে তা বন্ধ করুন
+      if (isGlobalSearchOpen) {
+        setIsGlobalSearchOpen(false);
+        return;
+      }
+      if (tocPreviewBook) {
+        setTocPreviewBook(null);
+        return;
+      }
+
+      // ৩. যদি বই পড়া অবস্থায় থাকে তবে ব্যাক দিলে লাইব্রেরিতে ফিরবে (অ্যাপ থেকে বের হবে না)
+      if (currentBook) {
+        setCurrentBook(null);
+        const progressMap = storageService.getAllProgress();
+        setAllProgress(progressMap);
+        setLastRead(storageService.getLastRead());
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // ৪. হোমে থাকলে পুনরায় হিস্ট্রি রেখে দেওয়া যাতে অসাবধানতাবশত বের না হয়
+      window.history.pushState({ page: 'home' }, '');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentBook, isSidebarOpen, isGlobalSearchOpen, tocPreviewBook]);
+
+  // গ্লোবাল কীবোর্ড ব্যাকস্পেস কি হ্যান্ডলার (ব্রাউজার এক্সিট রোধ)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target?.tagName)) {
+        e.preventDefault();
+        if (isSidebarOpen) {
+          setIsSidebarOpen(false);
+        } else if (isGlobalSearchOpen) {
+          setIsGlobalSearchOpen(false);
+        } else if (tocPreviewBook) {
+          setTocPreviewBook(null);
+        } else if (currentBook) {
+          handleBackToLibrary();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentBook, isSidebarOpen, isGlobalSearchOpen, tocPreviewBook]);
 
   // থিম টগল
   const toggleTheme = () => {
@@ -108,6 +170,9 @@ export default function App() {
     const bookProgress = allProgress[book.id];
     const pageToOpen = targetPage || bookProgress?.currentPage || 1;
 
+    // ব্রাউজার হিস্ট্রিতে পুশ যাতে ব্যাক বাটন চাপলে লাইব্রেরিতে ফেরে (অ্যাপ থেকে বের হবে না)
+    window.history.pushState({ page: 'reader', bookId: book.id }, '');
+
     setCurrentBook(book);
     setInitialReaderPage(pageToOpen);
     setInitialReaderMode(mode || 'pdf');
@@ -116,12 +181,15 @@ export default function App() {
 
   // লাইব্রেরিতে ফেরা
   const handleBackToLibrary = () => {
-    setCurrentBook(null);
-    // প্রগ্রেস রিফ্রেশ
-    const progressMap = storageService.getAllProgress();
-    setAllProgress(progressMap);
-    setLastRead(storageService.getLastRead());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.history.state?.page === 'reader') {
+      window.history.back();
+    } else {
+      setCurrentBook(null);
+      const progressMap = storageService.getAllProgress();
+      setAllProgress(progressMap);
+      setLastRead(storageService.getLastRead());
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // প্রগ্রেস আপডেট হ্যান্ডলার

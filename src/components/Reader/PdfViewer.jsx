@@ -30,12 +30,14 @@ export default function PdfViewer({
 
     try {
       const containerWidth = containerRef.current.clientWidth;
+      const containerHeight = containerRef.current.clientHeight || window.innerHeight;
       await pdfService.renderPage(
         doc,
         pageNum,
         canvasRef.current,
         zoomScale * pinchScale,
-        containerWidth
+        containerWidth,
+        containerHeight
       );
       setLoading(false);
     } catch (err) {
@@ -123,7 +125,7 @@ export default function PdfViewer({
           onToggleToolbars();
         }
       }}
-      className={`relative flex-1 w-full min-h-[calc(100vh-120px)] flex items-center justify-center p-2 sm:p-6 overflow-x-auto overflow-y-auto select-none transition-colors ${filterClass}`}
+      className={`relative flex-1 w-full h-full flex items-start sm:items-center justify-center p-0 sm:p-2 md:p-3 overflow-x-hidden overflow-y-auto select-none transition-colors ${filterClass}`}
     >
       {/* লোডিং স্পিনার */}
       {loading && (
@@ -137,7 +139,7 @@ export default function PdfViewer({
 
       {/* এরর মেসেজ */}
       {error && (
-        <div className="flex flex-col items-center justify-center p-6 text-center bg-red-50 dark:bg-red-950/40 rounded-2xl border border-red-200 dark:border-red-800 max-w-sm">
+        <div className="flex flex-col items-center justify-center p-6 text-center bg-red-50 dark:bg-red-950/40 rounded-2xl border border-red-200 dark:border-red-800 max-w-sm m-4">
           <AlertCircle className="w-8 h-8 text-red-500 mb-2" />
           <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-3">{error}</p>
           <button
@@ -149,11 +151,11 @@ export default function PdfViewer({
         </div>
       )}
 
-      {/* PDF রেন্ডারিং ক্যানভাস */}
-      <div className="relative shadow-2xl rounded-sm overflow-hidden bg-white max-w-full">
+      {/* PDF রেন্ডারিং ক্যানভাস - স্ক্রিনের বড় অংশজুড়ে ফিট */}
+      <div className="relative shadow-xl overflow-hidden bg-white w-full flex justify-center items-center">
         <canvas
           ref={canvasRef}
-          className="block mx-auto max-w-full h-auto shadow-md"
+          className="block mx-auto max-w-full h-auto shadow-sm"
         />
       </div>
 

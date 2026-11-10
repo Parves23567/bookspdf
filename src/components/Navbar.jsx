@@ -38,9 +38,7 @@ export default function Navbar({
             </button>
           ) : (
             <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={onBackToLibrary}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-library-primary to-library-primaryLight dark:from-library-primaryLight dark:to-library-primary flex items-center justify-center text-library-accent shadow-sm">
-                <BookOpen className="w-6 h-6" />
-              </div>
+              <img src="/favicon.svg" alt="লোগো" className="w-10 h-10 rounded-xl shadow-md object-cover" />
               <div>
                 <h1 className="font-bold text-base sm:text-lg leading-tight text-library-text dark:text-library-darkText">
                   আমার বাংলা লাইব্রেরি

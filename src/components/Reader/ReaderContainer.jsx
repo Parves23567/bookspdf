@@ -190,8 +190,10 @@ export default function ReaderContainer({
         onToggleSidebar={onToggleSidebar}
       />
 
-      {/* মূল রিডিং এরিয়া (টুলবারের প্যাডিং দিয়ে সেন্টার্ড) */}
-      <main className="flex-1 flex flex-col pt-14 pb-14 w-full h-full">
+      {/* মূল রিডিং এরিয়া (টুলবার লুকানো হলে ১০০% ফুলস্ক্রিন ব্যবহার) */}
+      <main className={`flex-1 flex flex-col transition-all duration-300 w-full h-full ${
+        toolbarsVisible ? 'pt-14 pb-14' : 'pt-0 pb-0'
+      }`}>
         {loadingDoc ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
             <Loader2 className="w-10 h-10 text-library-primary dark:text-library-accent animate-spin" />

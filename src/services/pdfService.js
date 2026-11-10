@@ -48,7 +48,7 @@ class PdfService {
   /**
    * নির্দিষ্ট পৃষ্ঠা ক্যানভাসে ড্র করে
    */
-  async renderPage(doc, pageNum, canvas, scale = 1.0, containerWidth = null) {
+  async renderPage(doc, pageNum, canvas, scale = 1.0, containerWidth = null, containerHeight = null) {
     if (!doc || !canvas || pageNum < 1 || pageNum > doc.numPages) return null;
 
     // পূর্বের কোনো রেন্ডার চালু থাকলে তা বাতিল করুন
@@ -66,14 +66,36 @@ class PdfService {
     try {
       const page = await doc.getPage(pageNum);
       
-      // মোবাইল বা কন্টেইনারের প্রস্থ অনুযায়ী স্কেল হিসেব করা
+      // মোবাইল বা কন্টেইনারের প্রস্থ ও উচ্চতা অনুযায়ী স্কেল হিসেব করা
       let finalScale = scale;
       const initialViewport = page.getViewport({ scale: 1.0 });
 
       if (containerWidth && containerWidth > 50) {
-        // প্রস্থ অনুযায়ী ফিট করা (হালকা মার্জিন রেখে)
-        const targetWidth = containerWidth - 16;
-        finalScale = (targetWidth / initialViewport.width) * scale;
+        const isMobile = containerWidth < 640;
+        
+        if (containerHeight && containerHeight > 100) {
+          const paddingX = isMobile ? 0 : (containerWidth < 1024 ? 12 : 24);
+          const paddingY = isMobile ? 0 : 16;
+          
+          const availWidth = Math.max(containerWidth - paddingX, 50);
+          const availHeight = Math.max(containerHeight - paddingY, 100);
+
+          const scaleWidth = availWidth / initialViewport.width;
+          const scaleHeight = availHeight / initialViewport.height;
+
+          if (isMobile) {
+            // মোবাইল পোর্ট্রেটে স্ক্রিনের সম্পূর্ণ প্রস্থ জুড়ে বড় ও স্পষ্ট পেজ ডিসপ্লে
+            finalScale = scaleWidth * scale;
+          } else {
+            // ট্যাবলেট ও ডেক্সটপে পুরো পেজ স্ক্রিনের বড় অংশ জুড়ে এক নজরে সুন্দরভাবে দৃশ্যমান
+            const fitScale = Math.min(scaleWidth, scaleHeight * 0.98);
+            finalScale = Math.max(fitScale, 0.6) * scale;
+          }
+        } else {
+          const padding = isMobile ? 0 : (containerWidth < 1024 ? 8 : 16);
+          const targetWidth = containerWidth - padding;
+          finalScale = (targetWidth / initialViewport.width) * scale;
+        }
       }
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2.5); // খুব বেশি মেমরি ব্যবহার রোধে সর্বোচ্চ ২.৫

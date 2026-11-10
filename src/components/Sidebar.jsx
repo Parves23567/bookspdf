@@ -68,9 +68,7 @@ export default function Sidebar({
         {/* ১. শীর্ষ হেডার */}
         <div className="p-4 border-b border-library-border dark:border-library-darkBorder flex items-center justify-between bg-emerald-50/60 dark:bg-emerald-950/20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-library-primary to-library-primaryLight dark:from-library-primaryLight dark:to-library-primary flex items-center justify-center text-library-accent shadow-sm">
-              <BookOpen className="w-5 h-5" />
-            </div>
+            <img src="/favicon.svg" alt="লোগো" className="w-10 h-10 rounded-xl shadow-md object-cover" />
             <div>
               <h2 className="font-bold text-base leading-tight text-library-text dark:text-library-darkText">
                 লাইব্রেরি মেনু ও সূচিপত্র

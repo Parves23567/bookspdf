@@ -152,34 +152,45 @@ export default function ReaderToolbar({
               <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
             </button>
 
-            {/* পঠন থিম নির্বাচন (Light / Sepia / Dark) */}
-            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
+            {/* পঠন থিম নির্বাচন (৩টি মোড: লাইট, সেপিয়া, নাইট) */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-library-border dark:border-library-darkBorder shadow-2xs">
               <button
                 onClick={() => onThemeFilterChange('light')}
-                className={`w-6 h-6 rounded-md flex items-center justify-center transition ${
-                  themeFilter === 'light' ? 'ring-2 ring-library-primary bg-white text-library-primary shadow-xs' : 'opacity-60 hover:opacity-100'
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                  themeFilter === 'light' 
+                    ? 'bg-white text-emerald-800 shadow-xs ring-1 ring-emerald-600/30 font-bold' 
+                    : 'text-library-textMuted hover:text-library-text'
                 }`}
-                title="লাইট মোড"
+                title="দিনের আলো (লাইট মোড)"
               >
-                <Sun className="w-3.5 h-3.5" />
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+                <span className="hidden lg:inline">লাইট</span>
               </button>
+
               <button
                 onClick={() => onThemeFilterChange('sepia')}
-                className={`w-6 h-6 rounded-md flex items-center justify-center transition bg-[#f4ecd8] text-[#5c4033] ${
-                  themeFilter === 'sepia' ? 'ring-2 ring-amber-600 font-bold shadow-xs' : 'opacity-60 hover:opacity-100'
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                  themeFilter === 'sepia' 
+                    ? 'bg-[#f4ecd8] text-[#5c4033] shadow-xs ring-1 ring-amber-600 font-bold' 
+                    : 'text-library-textMuted hover:text-library-text'
                 }`}
-                title="সেপিয়া (আই-কেয়ার চোখ-বান্ধব মোড)"
+                title="সেপিয়া (চোখ-বান্ধব আই-কেয়ার রিডিং মোড)"
               >
-                <span className="text-[10px] font-bold">সে</span>
+                <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                <span className="hidden lg:inline">সেপিয়া</span>
               </button>
+
               <button
                 onClick={() => onThemeFilterChange('dark')}
-                className={`w-6 h-6 rounded-md flex items-center justify-center transition bg-gray-900 text-yellow-300 ${
-                  themeFilter === 'dark' ? 'ring-2 ring-yellow-400 shadow-xs' : 'opacity-60 hover:opacity-100'
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                  themeFilter === 'dark' 
+                    ? 'bg-gray-900 text-yellow-300 shadow-xs ring-1 ring-yellow-400 font-bold' 
+                    : 'text-library-textMuted hover:text-library-text'
                 }`}
-                title="নাইট / ডার্ক মোড"
+                title="রাতের আঁধার (নাইট / ডার্ক মোড)"
               >
-                <Moon className="w-3.5 h-3.5" />
+                <Moon className="w-3.5 h-3.5 text-yellow-400" />
+                <span className="hidden lg:inline">নাইট</span>
               </button>
             </div>
 

@@ -43,7 +43,50 @@
 }
 
 .reader-filter-sepia canvas {
-  filter: sepia(0.35) contrast(0.98) brightness(0.96);
+  filter: sepia(0.55) contrast(0.92) brightness(0.95) saturate(1.15);
+}
+
+/* Global Sepia Theme Styles across the app */
+html.sepia, html.sepia body {
+  background-color: #fbf7ee !important;
+  color: #382d1d !important;
+}
+
+html.sepia .bg-library-bg,
+html.sepia .bg-white {
+  background-color: #fbf7ee !important;
+}
+
+html.sepia header,
+html.sepia aside,
+html.sepia footer {
+  background-color: #f5edd8 !important;
+  border-color: #e2d5b6 !important;
+}
+
+html.sepia .bg-white\/95 {
+  background-color: rgba(245, 237, 216, 0.95) !important;
+}
+
+html.sepia .border-library-border {
+  border-color: #e2d5b6 !important;
+}
+
+html.sepia .text-library-text {
+  color: #382d1d !important;
+}
+
+html.sepia .text-library-textMuted {
+  color: #7b6a52 !important;
+}
+
+html.sepia .bg-gray-50,
+html.sepia .bg-gray-100 {
+  background-color: #ede2c5 !important;
+}
+
+html.sepia ::-webkit-scrollbar-thumb {
+  background: rgba(120, 53, 15, 0.35);
 }
 
 /* Prevent text selection during pinch zoom on mobile */

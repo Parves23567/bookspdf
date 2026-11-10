@@ -6,6 +6,7 @@ export default function Navbar({
   onBackToLibrary, 
   theme, 
   onToggleTheme, 
+  onSelectTheme,
   isOnline, 
   installPrompt, 
   onInstallApp,
@@ -96,18 +97,47 @@ export default function Navbar({
             </button>
           )}
 
-          {/* ডার্ক / লাইট মোড টগল */}
-          <button
-            onClick={onToggleTheme}
-            className="p-2 rounded-lg text-library-textMuted hover:text-library-text dark:text-library-darkTextMuted dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder/60 transition"
-            title={theme === 'dark' ? 'লাইট মোডে পরিবর্তন' : 'ডার্ক মোডে পরিবর্তন'}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-amber-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-library-primary" />
-            )}
-          </button>
+          {/* ৩টি মোড: লাইট, সেপিয়া (বই পড়ার মোড), নাইট */}
+          <div className="flex items-center gap-0.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-library-border dark:border-library-darkBorder shadow-2xs">
+            <button
+              onClick={() => onSelectTheme ? onSelectTheme('light') : onToggleTheme('light')}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                theme === 'light' 
+                  ? 'bg-white text-emerald-800 shadow-xs ring-1 ring-emerald-600/30' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="দিনের আলো (লাইট মোড)"
+            >
+              <Sun className="w-3.5 h-3.5 text-amber-500" />
+              <span className="hidden md:inline">লাইট</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTheme ? onSelectTheme('sepia') : onToggleTheme('sepia')}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                theme === 'sepia' 
+                  ? 'bg-[#f4ecd8] text-[#5c4033] shadow-xs ring-1 ring-amber-600/50' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="সেপিয়া (চোখ-বান্ধব আই-কেয়ার রিডিং মোড)"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+              <span className="hidden md:inline">সেপিয়া</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTheme ? onSelectTheme('dark') : onToggleTheme('dark')}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition ${
+                theme === 'dark' 
+                  ? 'bg-gray-900 text-yellow-300 shadow-xs ring-1 ring-yellow-400/50' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="রাতের আঁধার (নাইট / ডার্ক মোড)"
+            >
+              <Moon className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="hidden md:inline">নাইট</span>
+            </button>
+          </div>
         </div>
 
       </div>

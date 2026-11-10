@@ -28,6 +28,7 @@ export default function Sidebar({
   onOpenSearch,
   theme,
   onToggleTheme,
+  onSelectTheme,
   isOnline
 }) {
   // কোন বইয়ের সূচিপত্র প্রসারিত রয়েছে তা ট্র্যাক করতে
@@ -317,25 +318,47 @@ export default function Sidebar({
             )}
           </div>
 
-          {/* থিম টগল */}
-          {onToggleTheme && (
+          {/* ৩টি মোড: লাইট, সেপিয়া, নাইট */}
+          <div className="flex items-center gap-0.5 bg-gray-200/60 dark:bg-gray-800 p-0.5 rounded-xl border border-library-border dark:border-library-darkBorder">
             <button
-              onClick={onToggleTheme}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-200/60 dark:hover:bg-gray-800 transition"
+              onClick={() => onSelectTheme ? onSelectTheme('light') : onToggleTheme('light')}
+              className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1 ${
+                theme === 'light' 
+                  ? 'bg-white text-emerald-800 shadow-xs' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="দিনের আলো (লাইট মোড)"
             >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span>লাইট মোড</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-library-primary" />
-                  <span>ডার্ক মোড</span>
-                </>
-              )}
+              <Sun className="w-3 h-3 text-amber-500" />
+              <span>লাইট</span>
             </button>
-          )}
+
+            <button
+              onClick={() => onSelectTheme ? onSelectTheme('sepia') : onToggleTheme('sepia')}
+              className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1 ${
+                theme === 'sepia' 
+                  ? 'bg-[#f4ecd8] text-[#5c4033] shadow-xs ring-1 ring-amber-600/40' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="সেপিয়া / আই-কেয়ার রিডিং মোড"
+            >
+              <BookOpen className="w-3 h-3 text-amber-700" />
+              <span>সেপিয়া</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTheme ? onSelectTheme('dark') : onToggleTheme('dark')}
+              className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1 ${
+                theme === 'dark' 
+                  ? 'bg-gray-900 text-yellow-300 shadow-xs' 
+                  : 'text-library-textMuted hover:text-library-text'
+              }`}
+              title="রাতের আঁধার (নাইট মোড)"
+            >
+              <Moon className="w-3 h-3 text-yellow-400" />
+              <span>নাইট</span>
+            </button>
+          </div>
         </div>
       </aside>
     </div>

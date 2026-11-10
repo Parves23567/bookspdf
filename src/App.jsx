@@ -34,13 +34,14 @@ export default function App() {
 
   // প্রারম্ভিক ইনিশিয়ালাইজেশন
   useEffect(() => {
-    // ১. থিম ইনিট
+    // ১. থিম ইনিট (৩টি মোড: লাইট, সেপিয়া, নাইট)
     const savedTheme = storageService.getAppTheme();
     setTheme(savedTheme);
+    document.documentElement.classList.remove('dark', 'sepia');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    } else if (savedTheme === 'sepia') {
+      document.documentElement.classList.add('sepia');
     }
 
     // ২. বইয়ের কনফিগ লোড
@@ -139,16 +140,29 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentBook, isSidebarOpen, isGlobalSearchOpen, tocPreviewBook]);
 
-  // থিম টগল
-  const toggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-    storageService.saveAppTheme(nextTheme);
-    if (nextTheme === 'dark') {
+  // থিম প্রয়োগ ও পরিবর্তন (৩টি মোড: লাইট, সেপিয়া, নাইট)
+  const applyTheme = (targetTheme) => {
+    setTheme(targetTheme);
+    storageService.saveAppTheme(targetTheme);
+    document.documentElement.classList.remove('dark', 'sepia');
+    if (targetTheme === 'dark') {
       document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    } else if (targetTheme === 'sepia') {
+      document.documentElement.classList.add('sepia');
     }
+  };
+
+  const handleSelectTheme = (targetTheme) => {
+    applyTheme(targetTheme);
+  };
+
+  const toggleTheme = (explicitTheme = null) => {
+    if (explicitTheme && ['light', 'sepia', 'dark'].includes(explicitTheme)) {
+      applyTheme(explicitTheme);
+      return;
+    }
+    const nextTheme = theme === 'light' ? 'sepia' : theme === 'sepia' ? 'dark' : 'light';
+    applyTheme(nextTheme);
   };
 
   // PWA অ্যাপ ইনস্টল ট্রিগার
@@ -217,6 +231,7 @@ export default function App() {
           onBackToLibrary={handleBackToLibrary}
           theme={theme}
           onToggleTheme={toggleTheme}
+          onSelectTheme={handleSelectTheme}
           isOnline={isOnline}
           installPrompt={installPrompt}
           onInstallApp={handleInstallApp}
@@ -235,6 +250,8 @@ export default function App() {
             onBack={handleBackToLibrary}
             onProgressUpdated={handleProgressUpdated}
             onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+            appTheme={theme}
+            onAppThemeChange={handleSelectTheme}
           />
         ) : (
           <Dashboard
@@ -305,6 +322,7 @@ export default function App() {
         onOpenSearch={() => handleOpenSearchModal('')}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onSelectTheme={handleSelectTheme}
         isOnline={isOnline}
       />
 

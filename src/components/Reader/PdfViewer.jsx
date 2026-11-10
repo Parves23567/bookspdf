@@ -152,7 +152,9 @@ export default function PdfViewer({
       )}
 
       {/* PDF রেন্ডারিং ক্যানভাস - স্ক্রিনের বড় অংশজুড়ে ফিট */}
-      <div className="relative shadow-xl overflow-hidden bg-white w-full flex justify-center items-center">
+      <div className={`relative shadow-xl overflow-hidden ${
+        themeFilter === 'sepia' ? 'bg-[#f4ecd8]' : themeFilter === 'dark' ? 'bg-[#121615]' : 'bg-white'
+      } w-full flex justify-center items-center`}>
         <canvas
           ref={canvasRef}
           className="block mx-auto max-w-full h-auto shadow-sm"

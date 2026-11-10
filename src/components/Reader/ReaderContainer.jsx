@@ -15,7 +15,9 @@ export default function ReaderContainer({
   initialMode = 'pdf',
   onBack,
   onProgressUpdated,
-  onToggleSidebar
+  onToggleSidebar,
+  appTheme = 'light',
+  onAppThemeChange
 }) {
   const [doc, setDoc] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(true);
@@ -33,7 +35,13 @@ export default function ReaderContainer({
     }
   }, [initialMode]);
   const [zoomScale, setZoomScale] = useState(1.0);
-  const [themeFilter, setThemeFilter] = useState('light'); // 'light' | 'sepia' | 'dark'
+  const [themeFilter, setThemeFilter] = useState(appTheme || 'light'); // 'light' | 'sepia' | 'dark'
+
+  useEffect(() => {
+    if (appTheme) {
+      setThemeFilter(appTheme);
+    }
+  }, [appTheme]);
   const [toolbarsVisible, setToolbarsVisible] = useState(true);
 
   // মোডাল স্টেট
@@ -129,10 +137,13 @@ export default function ReaderContainer({
     setCurrentToc(prev => [...prev, newChapter].sort((a, b) => a.page - b.page));
   };
 
-  // থিম ফিল্টার পরিবর্তন
+  // থিম ফিল্টার পরিবর্তন (৩টি মোড: লাইট, সেপিয়া, নাইট)
   const handleThemeFilterChange = (newTheme) => {
     setThemeFilter(newTheme);
     storageService.saveReaderSettings({ theme: newTheme, mode });
+    if (onAppThemeChange) {
+      onAppThemeChange(newTheme);
+    }
   };
 
   // মোড পরিবর্তন (PDF ⇋ Text)

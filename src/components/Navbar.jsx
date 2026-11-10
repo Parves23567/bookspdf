@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Moon, Sun, ArrowLeft, Download, Wifi, WifiOff, Search } from 'lucide-react';
+import { BookOpen, Moon, Sun, ArrowLeft, Download, Wifi, WifiOff, Search, Menu } from 'lucide-react';
 
 export default function Navbar({ 
   currentBook, 
@@ -9,14 +9,24 @@ export default function Navbar({
   isOnline, 
   installPrompt, 
   onInstallApp,
-  onOpenSearch 
+  onOpenSearch,
+  onToggleSidebar 
 }) {
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-library-darkCard/95 backdrop-blur border-b border-library-border dark:border-library-darkBorder transition-colors shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* বাম পাশ: লোগো বা ব্যাক বাটন */}
-        <div className="flex items-center space-x-3">
+        {/* বাম পাশ: মেনু বাটন + লোগো বা ব্যাক বাটন */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* মেনু বাটন (সব বই ও সূচিপত্রের সাইডবার) */}
+          <button
+            onClick={onToggleSidebar}
+            className="p-2 -ml-1 rounded-xl text-library-text dark:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder/60 transition flex items-center justify-center"
+            title="মেনু ও সূচিপত্র খুলুন"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
           {currentBook ? (
             <button
               onClick={onBackToLibrary}
@@ -27,15 +37,15 @@ export default function Navbar({
               <span className="hidden sm:inline">লাইব্রেরি</span>
             </button>
           ) : (
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={onBackToLibrary}>
+            <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={onBackToLibrary}>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-library-primary to-library-primaryLight dark:from-library-primaryLight dark:to-library-primary flex items-center justify-center text-library-accent shadow-sm">
                 <BookOpen className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="font-bold text-lg leading-tight text-library-text dark:text-library-darkText">
+                <h1 className="font-bold text-base sm:text-lg leading-tight text-library-text dark:text-library-darkText">
                   আমার বাংলা লাইব্রেরি
                 </h1>
-                <p className="text-xs text-library-textMuted dark:text-library-darkTextMuted hidden xs:block">
+                <p className="text-[11px] text-library-textMuted dark:text-library-darkTextMuted hidden xs:block">
                   ডিজিটাল বই সংকলন
                 </p>
               </div>

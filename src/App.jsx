@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import ReaderContainer from './components/Reader/ReaderContainer';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import TocPreviewModal from './components/TocPreviewModal';
+import Sidebar from './components/Sidebar';
 import { fetchBooksConfig, INITIAL_BOOKS } from './config/booksConfig';
 import { storageService } from './services/storageService';
 import { BookOpen, Heart, Sparkles, Smartphone } from 'lucide-react';
@@ -17,6 +18,9 @@ export default function App() {
   const [theme, setTheme] = useState('light');
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [installPrompt, setInstallPrompt] = useState(null);
+
+  // সাইডবার (মেনু বার ও সূচিপত্র) স্টেট
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // প্রগ্রেস ও বুকমার্ক স্টেট
   const [allProgress, setAllProgress] = useState({});
@@ -144,6 +148,7 @@ export default function App() {
           installPrompt={installPrompt}
           onInstallApp={handleInstallApp}
           onOpenSearch={() => handleOpenSearchModal('')}
+          onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
         />
       )}
 
@@ -155,6 +160,7 @@ export default function App() {
             initialPage={initialReaderPage}
             onBack={handleBackToLibrary}
             onProgressUpdated={handleProgressUpdated}
+            onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
           />
         ) : (
           <Dashboard
@@ -206,6 +212,26 @@ export default function App() {
         books={books}
         initialQuery={searchInitialQuery}
         onSelectBook={handleSelectBook}
+      />
+
+      {/* বাম পাশের সাইডবার (মেনু বার ও সব বইয়ের সূচিপত্র তালিকা) */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        books={books}
+        currentBook={currentBook}
+        allProgress={allProgress}
+        onSelectBook={(book, page) => {
+          if (!book) {
+            handleBackToLibrary();
+          } else {
+            handleSelectBook(book, page);
+          }
+        }}
+        onOpenSearch={() => handleOpenSearchModal('')}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        isOnline={isOnline}
       />
 
       {/* সূচিপত্র প্রিভিউ মোডাল */}

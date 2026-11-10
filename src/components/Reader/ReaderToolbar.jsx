@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Bookmark, Search, List, Sun, Moon, 
   Maximize, Minimize, ZoomIn, ZoomOut, RotateCcw,
-  BookOpen, FileText, ChevronLeft, ChevronRight, Sliders
+  BookOpen, FileText, ChevronLeft, ChevronRight, Sliders, Menu
 } from 'lucide-react';
 
 export default function ReaderToolbar({
@@ -22,7 +22,8 @@ export default function ReaderToolbar({
   onOpenSearch,
   onOpenBookmarks,
   onBack,
-  visible
+  visible,
+  onToggleSidebar
 }) {
   const [pageInput, setPageInput] = useState(String(currentPage));
 
@@ -60,8 +61,8 @@ export default function ReaderToolbar({
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
           
-          {/* বাম পাশ: ব্যাক বাটন ও বইয়ের নাম */}
-          <div className="flex items-center gap-2 min-w-0">
+          {/* বাম পাশ: ব্যাক বাটন, মেনু বাটন ও বইয়ের নাম */}
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
             <button
               onClick={onBack}
               className="p-2 rounded-xl text-library-primary dark:text-library-accent hover:bg-gray-100 dark:hover:bg-library-darkBorder/60 transition"
@@ -69,6 +70,15 @@ export default function ReaderToolbar({
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
+            {onToggleSidebar && (
+              <button
+                onClick={onToggleSidebar}
+                className="p-2 rounded-xl text-library-text dark:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder/60 transition"
+                title="সকল বই ও সূচিপত্র মেনু"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
             <div className="min-w-0">
               <h2 className="font-bold text-xs sm:text-sm text-library-text dark:text-library-darkText truncate max-w-[180px] sm:max-w-xs md:max-w-md">
                 {book.title}

@@ -13,7 +13,8 @@ export default function ReaderContainer({
   book,
   initialPage = 1,
   onBack,
-  onProgressUpdated
+  onProgressUpdated,
+  onToggleSidebar
 }) {
   const [doc, setDoc] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(true);
@@ -179,6 +180,7 @@ export default function ReaderContainer({
         onOpenBookmarks={() => setIsBookmarksOpen(true)}
         onBack={onBack}
         visible={toolbarsVisible}
+        onToggleSidebar={onToggleSidebar}
       />
 
       {/* মূল রিডিং এরিয়া (টুলবারের প্যাডিং দিয়ে সেন্টার্ড) */}

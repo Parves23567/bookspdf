@@ -229,7 +229,7 @@ export default function TextReader({
           </div>
         ) : text && text.trim().length > 0 ? (
           <article
-            className={`transition-all whitespace-pre-wrap ${
+            className={`transition-all ${
               fontFamily === 'serif' ? 'font-serif' : 'font-hind'
             }`}
             style={{
@@ -237,9 +237,9 @@ export default function TextReader({
               lineHeight: lineHeight
             }}
           >
-            {text.split('\n\n').map((para, idx) => (
-              <p key={idx} className="mb-6 text-justify tracking-normal">
-                {para}
+            {text.split('\n\n').filter(p => p.trim()).map((para, idx) => (
+              <p key={idx} className="mb-6 text-justify" style={{ wordBreak: 'normal', overflowWrap: 'break-word' }}>
+                {para.trim()}
               </p>
             ))}
           </article>

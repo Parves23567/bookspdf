@@ -66,7 +66,7 @@ class PdfService {
     try {
       const page = await doc.getPage(pageNum);
       
-      // মোবাইল বা কন্টেইনারের প্রস্থ ও উচ্চতা অনুযায়ী স্কেল হিসেব করা
+      // মোবাইল বা কন্টেইনারের প্রস্থ ও উচ্চতা অনুযায়ী স্কেল হিসেব করা
       let finalScale = scale;
       const initialViewport = page.getViewport({ scale: 1.0 });
 
@@ -84,10 +84,10 @@ class PdfService {
           const scaleHeight = availHeight / initialViewport.height;
 
           if (isMobile) {
-            // মোবাইল পোর্ট্রেটে স্ক্রিনের সম্পূর্ণ প্রস্থ জুড়ে বড় ও স্পষ্ট পেজ ডিসপ্লে
+            // মোবাইল পোর্ট্রেটে স্ক্রিনের সম্পূর্ণ প্রস্থ জুড়ে বড় ও স্পষ্ট পেজ ডিসপ্লে
             finalScale = scaleWidth * scale;
           } else {
-            // ট্যাবলেট ও ডেক্সটপে পুরো পেজ স্ক্রিনের বড় অংশ জুড়ে এক নজরে সুন্দরভাবে দৃশ্যমান
+            // ট্যাবলেট ও ডেক্সটপে পুরো পেজ স্ক্রিনের বড় অংশ জুড়ে এক নজরে সুন্দরভাবে দৃশ্যমান
             const fitScale = Math.min(scaleWidth, scaleHeight * 0.98);
             finalScale = Math.max(fitScale, 0.6) * scale;
           }
@@ -131,7 +131,7 @@ class PdfService {
       };
     } catch (err) {
       if (err?.name === 'RenderingCancelledException') {
-        // ইউজার দ্রুত পেজ পরিবর্তন করলে রেন্ডারিং বাতিল হওয়া স্বাভাবিক
+        // ইউজার দ্রুত পেজ পরিবর্তন করলে রেন্ডারিং বাতিল হওয়া স্বাভাবিক
         return null;
       }
       console.error(`Page render failed for page ${pageNum}:`, err);
@@ -140,7 +140,9 @@ class PdfService {
   }
 
   /**
-   * টেক্সট রিডার মোডের জন্য পৃষ্ঠা থেকে ফরম্যাটেড টেক্সট রিড করে
+   * টেক্সট রিডার মোডের জন্য পৃষ্ঠা থেকে ফরম্যাটেড টেক্সট রিড করে।
+   * Bengali/Indic PDFs-এ প্রতিটি গ্লিফ আলাদা item — তাই x-gap দেখে
+   * সঠিকভাবে শব্দ ও প্যারাগ্রাফ গঠন করা হয়।
    */
   async extractPageText(doc, pageNum) {
     const cacheKey = `${doc.fingerprint || 'doc'}_${pageNum}`;
@@ -150,35 +152,84 @@ class PdfService {
 
     try {
       const page = await doc.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      
-      let lastY = null;
-      let textLines = [];
-      let currentLine = '';
+      const textContent = await page.getTextContent({ includeMarkedContent: false });
 
-      // লাইন ও প্যারাগ্রাফ বিন্যাস
-      for (const item of textContent.items) {
-        if (!item.str) continue;
-        const currentY = Math.round(item.transform[5]);
+      // ── থ্রেশহোল্ড ─────────────────────────────────────────────────────
+      const SAME_LINE_Y   = 4;   // এই পরিমাণ Y-পার্থক্য থাকলে একই লাইন
+      const WORD_GAP_MIN  = 2;   // এই পরিমাণ X-ফাঁক থাকলে নতুন শব্দ
 
-        if (lastY === null) {
-          lastY = currentY;
-          currentLine = item.str;
-        } else if (Math.abs(currentY - lastY) > 5) {
-          // নতুন লাইন শুরু
-          textLines.push(currentLine.trim());
-          currentLine = item.str;
-          lastY = currentY;
+      // সব item ফিল্টার
+      const items = textContent.items.filter(it => it.str != null && it.str !== '');
+
+      // ── Y অনুযায়ী লাইনে ভাগ করা ──────────────────────────────────────
+      const lines = [];
+      let currentLine = null;
+
+      for (const item of items) {
+        const y = item.transform[5];
+        const x = item.transform[4];
+        const w = item.width != null ? item.width : (item.str.length * 5); // fallback width
+
+        if (!currentLine || Math.abs(y - currentLine.y) > SAME_LINE_Y) {
+          currentLine = { y, segments: [] };
+          lines.push(currentLine);
+        }
+        currentLine.segments.push({ x, w, str: item.str });
+      }
+
+      // ── PDF Y-axis উল্টো তাই নিচ থেকে উপরে sort (top-of-page first) ──
+      lines.sort((a, b) => b.y - a.y);
+
+      // ── প্রতিটি লাইনের সেগমেন্ট বাম থেকে ডানে merge করা ────────────
+      const mergedLines = lines.map(line => {
+        line.segments.sort((a, b) => a.x - b.x);
+        let result = '';
+        let prevRight = null;
+
+        for (const seg of line.segments) {
+          if (prevRight === null) {
+            result = seg.str;
+          } else {
+            const gap = seg.x - prevRight;
+            if (gap > WORD_GAP_MIN) {
+              // সত্যিকারের শব্দ ফাঁক — একটি space যোগ করো
+              result += ' ' + seg.str;
+            } else {
+              // পাশাপাশি গ্লিফ — space ছাড়াই জোড়া লাগাও (Bengali ligature)
+              result += seg.str;
+            }
+          }
+          prevRight = seg.x + seg.w;
+        }
+        return result.trim();
+      }).filter(l => l.length > 0);
+
+      // ── লাইনগুলোকে প্যারাগ্রাফে রূপান্তর করা ─────────────────────────
+      // নিয়ম: বাক্য-সমাপ্তি চিহ্নে (।  !  ?  .) প্যারাগ্রাফ বিরতি দাও,
+      // অন্যথায় একই প্যারাগ্রাফে space দিয়ে জুড়ে দাও।
+      let paragraphs = [];
+      let currentPara = '';
+
+      for (let i = 0; i < mergedLines.length; i++) {
+        const line = mergedLines[i];
+        const isEnd = /[।!?.]$/.test(line);
+
+        if (currentPara === '') {
+          currentPara = line;
         } else {
-          // একই লাইনে স্পেস দিয়ে যুক্ত করা
-          currentLine += (item.hasEOL ? '\n' : ' ') + item.str;
+          currentPara += ' ' + line;
+        }
+
+        if (isEnd) {
+          paragraphs.push(currentPara);
+          currentPara = '';
         }
       }
-      if (currentLine.trim()) {
-        textLines.push(currentLine.trim());
+      if (currentPara.trim()) {
+        paragraphs.push(currentPara);
       }
 
-      const fullText = textLines.join('\n\n');
+      const fullText = paragraphs.join('\n\n');
       this.textCache.set(cacheKey, fullText);
       return fullText;
     } catch (err) {

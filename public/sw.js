@@ -1,5 +1,5 @@
 // Service Worker for Bangla Digital Library PWA
-const CACHE_NAME = 'bangla-library-v1.0.3';
+const CACHE_NAME = 'bangla-library-v1.0.4';
 
 const PRECACHE_URLS = [
   '/',

@@ -1,5 +1,5 @@
 // Service Worker for Bangla Digital Library PWA
-const CACHE_NAME = 'bangla-library-v1.0.1';
+const CACHE_NAME = 'bangla-library-v1.0.2';
 
 const PRECACHE_URLS = [
   '/',
@@ -14,7 +14,8 @@ const PRECACHE_URLS = [
   '/data/search-index.json',
   '/covers/arober-gotro.png',
   '/covers/nobojatoker-nam.png',
-  '/covers/makkar-power-politics.png'
+  '/covers/makkar-power-politics.png',
+  '/covers/poro.png'
 ];
 
 // Install: Pre-cache core assets

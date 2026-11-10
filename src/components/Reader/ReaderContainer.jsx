@@ -12,6 +12,7 @@ import InBookSearchModal from './InBookSearchModal';
 export default function ReaderContainer({
   book,
   initialPage = 1,
+  initialMode = 'pdf',
   onBack,
   onProgressUpdated,
   onToggleSidebar
@@ -24,7 +25,13 @@ export default function ReaderContainer({
   const totalPages = book.pagesCount || book.pages || (doc?.numPages) || 1;
 
   // সেটিংস স্টেট
-  const [mode, setMode] = useState('pdf'); // 'pdf' | 'text'
+  const [mode, setMode] = useState(initialMode || 'pdf'); // 'pdf' | 'text'
+
+  useEffect(() => {
+    if (initialMode) {
+      setMode(initialMode);
+    }
+  }, [initialMode]);
   const [zoomScale, setZoomScale] = useState(1.0);
   const [themeFilter, setThemeFilter] = useState('light'); // 'light' | 'sepia' | 'dark'
   const [toolbarsVisible, setToolbarsVisible] = useState(true);
@@ -239,7 +246,9 @@ export default function ReaderContainer({
             totalPages={totalPages}
             onPageChange={handlePageChange}
             themeFilter={themeFilter}
+            onThemeFilterChange={handleThemeFilterChange}
             onToggleToolbars={() => setToolbarsVisible(prev => !prev)}
+            onSwitchToPdf={() => setMode('pdf')}
           />
         )}
       </main>

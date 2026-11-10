@@ -1,5 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Loader2, Type, Sliders, ChevronLeft, ChevronRight, BookOpen, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { 
+  Loader2, 
+  Type, 
+  Sliders, 
+  ChevronLeft, 
+  ChevronRight, 
+  BookOpen, 
+  FileText, 
+  AlertCircle,
+  Sun,
+  Moon,
+  AlignJustify,
+  Maximize2
+} from 'lucide-react';
 import { pdfService } from '../../services/pdfService';
 import { storageService } from '../../services/storageService';
 
@@ -9,12 +22,13 @@ export default function TextReader({
   pageNum,
   totalPages,
   onPageChange,
-  themeFilter,
-  onToggleToolbars
+  themeFilter = 'light',
+  onThemeFilterChange,
+  onToggleToolbars,
+  onSwitchToPdf
 }) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showTypographyPanel, setShowTypographyPanel] = useState(false);
 
   // সেটিংস
   const [fontSize, setFontSize] = useState(19);
@@ -79,15 +93,15 @@ export default function TextReader({
   // ফন্ট পরিবর্তন সংরক্ষণ
   const updateFontSize = (delta) => {
     setFontSize(prev => {
-      const next = Math.min(32, Math.max(14, prev + delta));
+      const next = Math.min(34, Math.max(14, prev + delta));
       storageService.saveReaderSettings({ fontSize: next, lineHeight });
       return next;
     });
   };
 
-  const updateLineHeight = (delta) => {
+  const toggleLineHeight = () => {
     setLineHeight(prev => {
-      const next = Math.min(2.6, Math.max(1.4, Math.round((prev + delta) * 10) / 10));
+      const next = prev === 1.7 ? 2.0 : prev === 2.0 ? 2.3 : 1.7;
       storageService.saveReaderSettings({ fontSize, lineHeight: next });
       return next;
     });
@@ -105,22 +119,36 @@ export default function TextReader({
   return (
     <div className={`flex-1 flex flex-col w-full min-h-[calc(100vh-120px)] transition-colors ${currentThemeStyle.split(' ')[0]}`}>
       
-      {/* টাইপোগ্রাফি কন্ট্রোল প্যানেল (মোবাইল ও ডেক্সটপ) */}
-      <div className="border-b border-black/10 dark:border-white/10 px-4 py-2 flex items-center justify-between text-xs backdrop-blur-sm sticky top-0 z-10 bg-inherit">
+      {/* ১. শীর্ষ রিডিং মোড কন্ট্রোল বার (মোবাইল ও ডেক্সটপ) */}
+      <div className="border-b border-black/10 dark:border-white/10 px-3 sm:px-6 py-2 flex items-center justify-between text-xs backdrop-blur-md sticky top-0 z-20 bg-inherit shadow-2xs">
+        
+        {/* বাম পাশ: রিডিং মোড ব্যাজ ও মূল PDF সুইচ */}
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-library-primary dark:text-library-accent flex items-center gap-1">
-            <BookOpen className="w-3.5 h-3.5" /> টেক্সট রিডিং মোড
+          <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+            <FileText className="w-3.5 h-3.5" />
+            <span>রিডিং মোড</span>
           </span>
-          <span className="text-gray-400">|</span>
-          <span className="opacity-75">পৃষ্ঠা {pageNum} / {totalPages}</span>
+
+          {onSwitchToPdf && (
+            <button
+              onClick={onSwitchToPdf}
+              className="px-2.5 py-1 rounded-lg border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/10 transition font-medium text-library-textMuted hover:text-library-text flex items-center gap-1"
+              title="মূল PDF পৃষ্ঠায় পরিবর্তন করুন"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">মূল PDF</span>
+            </button>
+          )}
         </div>
 
-        {/* ফন্ট সাইজ ও স্পেসিং কুইক কন্ট্রোলস */}
-        <div className="flex items-center gap-2">
+        {/* ডান পাশ: ফন্ট সাইজ, স্পেসিং, ফন্ট ফ্যামিলি ও থিম */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          
+          {/* ফন্ট সাইজ কন্ট্রোল */}
           <div className="flex items-center bg-black/5 dark:bg-white/10 rounded-lg p-0.5">
             <button
               onClick={() => updateFontSize(-1)}
-              className="px-2 py-1 hover:bg-black/10 dark:hover:bg-white/10 rounded font-bold"
+              className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded font-bold text-xs"
               title="ফন্ট সাইজ ছোট করুন"
             >
               A-
@@ -128,35 +156,79 @@ export default function TextReader({
             <span className="px-1 text-[11px] font-mono opacity-80">{fontSize}px</span>
             <button
               onClick={() => updateFontSize(1)}
-              className="px-2 py-1 hover:bg-black/10 dark:hover:bg-white/10 rounded font-bold"
+              className="px-2 py-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded font-bold text-xs"
               title="ফন্ট সাইজ বড় করুন"
             >
               A+
             </button>
           </div>
 
+          {/* লাইন স্পেসিং টগল */}
+          <button
+            onClick={toggleLineHeight}
+            className="p-1.5 rounded-lg bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition"
+            title={`লাইন স্পেসিং: ${lineHeight} (ক্লিক করে পরিবর্তন করুন)`}
+          >
+            <AlignJustify className="w-3.5 h-3.5" />
+          </button>
+
+          {/* ফন্ট স্টাইল (হিন্দ শিলিগুড়ি / সেরিফ) */}
           <button
             onClick={() => setFontFamily(prev => prev === 'hind' ? 'serif' : 'hind')}
-            className="px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition font-medium"
+            className="px-2 py-1 rounded-lg bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition font-medium text-[11px]"
             title="ফন্ট স্টাইল পরিবর্তন করুন"
           >
             {fontFamily === 'hind' ? 'সেরিফ' : 'স্যান্স'}
           </button>
+
+          {/* থিম পরিবর্তন (Light / Sepia / Dark) */}
+          {onThemeFilterChange && (
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-black/5 dark:bg-white/10">
+              <button
+                onClick={() => onThemeFilterChange('light')}
+                className={`w-5 h-5 rounded flex items-center justify-center transition ${
+                  themeFilter === 'light' ? 'bg-white text-emerald-800 shadow-2xs font-bold' : 'opacity-60'
+                }`}
+                title="দিনের আলো (Light)"
+              >
+                <Sun className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => onThemeFilterChange('sepia')}
+                className={`w-5 h-5 rounded flex items-center justify-center transition bg-[#e8d8b8] text-[#3d2f1f] ${
+                  themeFilter === 'sepia' ? 'ring-1 ring-amber-700 font-bold' : 'opacity-60'
+                }`}
+                title="সেপিয়া (আই-কেয়ার চোখ-বান্ধব)"
+              >
+                <span className="text-[9px] font-bold">সে</span>
+              </button>
+              <button
+                onClick={() => onThemeFilterChange('dark')}
+                className={`w-5 h-5 rounded flex items-center justify-center transition bg-gray-900 text-yellow-300 ${
+                  themeFilter === 'dark' ? 'ring-1 ring-yellow-400' : 'opacity-60'
+                }`}
+                title="রাতের অন্ধকার (Night)"
+              >
+                <Moon className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
         </div>
       </div>
 
-      {/* টেক্সট কন্টেইনার */}
+      {/* ২. টেক্সট কন্টেইনার (মোবাইল-ফার্স্ট মার্জিত টাইপোগ্রাফি) */}
       <div 
         onClick={onToggleToolbars}
-        className="flex-1 max-w-3xl mx-auto w-full px-5 sm:px-10 py-8 leading-relaxed select-text"
+        className="flex-1 max-w-3xl mx-auto w-full px-5 sm:px-10 py-8 leading-relaxed select-text cursor-default"
       >
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-3">
-            <Loader2 className="w-7 h-7 text-library-primary dark:text-library-accent animate-spin" />
-            <p className="text-xs font-medium opacity-70">পৃষ্ঠার বাংলা লেখা সাজানো হচ্ছে...</p>
+            <Loader2 className="w-8 h-8 text-library-primary dark:text-library-accent animate-spin" />
+            <p className="text-xs font-semibold opacity-75">পৃষ্ঠার বাংলা লেখা রিডিং মোডে সাজানো হচ্ছে...</p>
           </div>
         ) : text && text.trim().length > 0 ? (
-          <div
+          <article
             className={`transition-all whitespace-pre-wrap ${
               fontFamily === 'serif' ? 'font-serif' : 'font-hind'
             }`}
@@ -166,35 +238,46 @@ export default function TextReader({
             }}
           >
             {text.split('\n\n').map((para, idx) => (
-              <p key={idx} className="mb-5 text-justify">
+              <p key={idx} className="mb-6 text-justify tracking-normal">
                 {para}
               </p>
             ))}
-          </div>
+          </article>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-3 opacity-80">
-            <AlertCircle className="w-8 h-8 text-amber-500" />
-            <h4 className="font-semibold text-sm">এই পৃষ্ঠায় এক্সট্রাক্টযোগ্য টেক্সট সীমিত</h4>
-            <p className="text-xs max-w-xs">
-              পৃষ্ঠাটি সম্ভবত চিত্র বা বিশেষ প্রচ্ছদ। সম্পূর্ণ নিখুঁত প্রদর্শনের জন্য "মূল PDF ভিউয়ার" ব্যবহার করুন।
-            </p>
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-90">
+            <AlertCircle className="w-10 h-10 text-amber-500" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm sm:text-base">এই পৃষ্ঠায় টেক্সট এক্সট্রাক্ট করা সম্ভব হয়নি</h4>
+              <p className="text-xs max-w-sm text-library-textMuted dark:text-library-darkTextMuted">
+                পৃষ্ঠাটি সম্ভবত চিত্রবহুল বা বিশেষ প্রচ্ছদ। সম্পূর্ণ নিখুঁতভাবে দেখতে নিচের বাটনে ক্লিক করুন।
+              </p>
+            </div>
+            {onSwitchToPdf && (
+              <button
+                onClick={onSwitchToPdf}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-library-primary text-white dark:bg-library-accent dark:text-library-primaryDark font-semibold text-xs shadow-sm hover:opacity-90 transition"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>মূল PDF পৃষ্ঠায় দেখুন</span>
+              </button>
+            )}
           </div>
         )}
       </div>
 
-      {/* টেক্সট মোডের বটম পেজার */}
+      {/* ৩. টেক্সট মোডের বটম পেজার */}
       <div className="border-t border-black/10 dark:border-white/10 px-4 py-3 flex items-center justify-between text-xs bg-inherit max-w-3xl mx-auto w-full">
         <button
           onClick={() => pageNum > 1 && onPageChange(pageNum - 1)}
           disabled={pageNum <= 1}
           className={`flex items-center gap-1 px-4 py-2 rounded-xl font-medium transition ${
-            pageNum <= 1 ? 'opacity-30 pointer-events-none' : 'bg-black/5 dark:bg-white/10 hover:bg-black/10'
+            pageNum <= 1 ? 'opacity-30 pointer-events-none' : 'bg-black/5 dark:bg-white/10 hover:bg-black/10 shadow-2xs'
           }`}
         >
           <ChevronLeft className="w-4 h-4" /> আগের পৃষ্ঠা
         </button>
 
-        <span className="font-semibold opacity-80">
+        <span className="font-semibold opacity-80 font-mono">
           পৃষ্ঠা {pageNum} / {totalPages}
         </span>
 
@@ -202,7 +285,7 @@ export default function TextReader({
           onClick={() => pageNum < totalPages && onPageChange(pageNum + 1)}
           disabled={pageNum >= totalPages}
           className={`flex items-center gap-1 px-4 py-2 rounded-xl font-medium transition ${
-            pageNum >= totalPages ? 'opacity-30 pointer-events-none' : 'bg-black/5 dark:bg-white/10 hover:bg-black/10'
+            pageNum >= totalPages ? 'opacity-30 pointer-events-none' : 'bg-black/5 dark:bg-white/10 hover:bg-black/10 shadow-2xs'
           }`}
         >
           পরের পৃষ্ঠা <ChevronRight className="w-4 h-4" />

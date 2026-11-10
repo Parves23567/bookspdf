@@ -117,24 +117,34 @@ export default function BookCard({ book, progress, onSelectBook, onOpenToc }) {
         </div>
 
         {/* বাটনসমূহ */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
-          {book.toc && book.toc.length > 0 && (
+        <div className="space-y-2 pt-1">
+          <div className="grid grid-cols-2 gap-2">
+            {book.toc && book.toc.length > 0 && (
+              <button
+                onClick={() => onOpenToc(book)}
+                className="px-3 py-2 text-xs font-medium rounded-xl border border-library-border dark:border-library-darkBorder text-library-text dark:text-library-darkText hover:bg-gray-50 dark:hover:bg-library-darkBorder/40 transition flex items-center justify-center gap-1"
+              >
+                <Bookmark className="w-3.5 h-3.5 text-library-accent" /> সূচিপত্র
+              </button>
+            )}
+
             <button
-              onClick={() => onOpenToc(book)}
-              className="px-3 py-2 text-xs font-medium rounded-xl border border-library-border dark:border-library-darkBorder text-library-text dark:text-library-darkText hover:bg-gray-50 dark:hover:bg-library-darkBorder/40 transition flex items-center justify-center gap-1"
+              onClick={() => onSelectBook(book, currentPage, 'text')}
+              className="px-3 py-2 text-xs font-semibold rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition flex items-center justify-center gap-1.5 shadow-2xs"
+              title="পরিচ্ছন্ন মোবাইল টেক্সট রিডিং মোডে পড়ুন"
             >
-              <Bookmark className="w-3.5 h-3.5 text-library-accent" /> সূচিপত্র
+              <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>রিডিং মোড</span>
             </button>
-          )}
+          </div>
 
           <button
-            onClick={() => onSelectBook(book, currentPage)}
-            className={`px-4 py-2.5 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-1 ${
-              book.toc && book.toc.length > 0 ? '' : 'col-span-2'
-            } bg-library-primary hover:bg-library-primaryLight text-white dark:bg-library-accent dark:text-library-primaryDark dark:hover:bg-library-accentLight`}
+            onClick={() => onSelectBook(book, currentPage, 'pdf')}
+            className="w-full px-4 py-2.5 text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5 bg-library-primary hover:bg-library-primaryLight text-white dark:bg-library-accent dark:text-library-primaryDark dark:hover:bg-library-accentLight"
           >
-            {hasStarted ? 'পড়া চালিয়ে যান' : 'এখনই পড়ুন'}
-            <ChevronRight className="w-3.5 h-3.5" />
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{hasStarted ? `পৃষ্ঠা ${currentPage}-এ পড়ুন (PDF)` : 'এখনই পড়ুন (PDF)'}</span>
+            <ChevronRight className="w-3.5 h-3.5 ml-auto" />
           </button>
         </div>
 

@@ -13,6 +13,7 @@ export default function App() {
   const [books, setBooks] = useState(INITIAL_BOOKS);
   const [currentBook, setCurrentBook] = useState(null);
   const [initialReaderPage, setInitialReaderPage] = useState(1);
+  const [initialReaderMode, setInitialReaderMode] = useState('pdf');
 
   // থিম ও অনলাইন স্টেট
   const [theme, setTheme] = useState('light');
@@ -99,13 +100,17 @@ export default function App() {
   };
 
   // বই নির্বাচন ও রিডার ওপেন
-  const handleSelectBook = (book, targetPage = 1) => {
-    // যদি প্রগ্রেস থাকে তবে আগের পৃষ্ঠা থেকে শুরু
+  const handleSelectBook = (book, targetPage = null, mode = 'pdf') => {
+    if (!book) {
+      handleBackToLibrary();
+      return;
+    }
     const bookProgress = allProgress[book.id];
     const pageToOpen = targetPage || bookProgress?.currentPage || 1;
 
     setCurrentBook(book);
     setInitialReaderPage(pageToOpen);
+    setInitialReaderMode(mode || 'pdf');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -158,6 +163,7 @@ export default function App() {
           <ReaderContainer
             book={currentBook}
             initialPage={initialReaderPage}
+            initialMode={initialReaderMode}
             onBack={handleBackToLibrary}
             onProgressUpdated={handleProgressUpdated}
             onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
@@ -221,11 +227,11 @@ export default function App() {
         books={books}
         currentBook={currentBook}
         allProgress={allProgress}
-        onSelectBook={(book, page) => {
+        onSelectBook={(book, page, mode) => {
           if (!book) {
             handleBackToLibrary();
           } else {
-            handleSelectBook(book, page);
+            handleSelectBook(book, page, mode);
           }
         }}
         onOpenSearch={() => handleOpenSearchModal('')}

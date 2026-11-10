@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Sparkles, BookOpen, Clock, ArrowRight, ShieldCheck, Smartphone, Zap } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Clock, ArrowRight, ShieldCheck, Smartphone, Zap, FileText } from 'lucide-react';
 import BookCard from './BookCard';
 
 export default function Dashboard({ 
@@ -130,12 +130,21 @@ export default function Dashboard({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
-              onClick={() => onSelectBook(lastReadBook, lastRead.currentPage)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-library-primary hover:bg-library-primaryLight text-white dark:bg-library-accent dark:text-library-primaryDark dark:hover:bg-library-accentLight font-semibold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition"
+              onClick={() => onSelectBook(lastReadBook, lastRead.currentPage, 'text')}
+              className="px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-semibold text-xs sm:text-sm shadow-2xs flex items-center justify-center gap-1.5 transition"
+              title="পরিচ্ছন্ন মোবাইল টেক্সট রিডিং মোড"
             >
-              <span>পড়া চালিয়ে যান</span>
+              <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>রিডিং মোড</span>
+            </button>
+
+            <button
+              onClick={() => onSelectBook(lastReadBook, lastRead.currentPage, 'pdf')}
+              className="px-5 py-2.5 rounded-xl bg-library-primary hover:bg-library-primaryLight text-white dark:bg-library-accent dark:text-library-primaryDark dark:hover:bg-library-accentLight font-semibold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition"
+            >
+              <span>চালিয়ে যান (PDF)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

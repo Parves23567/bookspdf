@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   BookOpen, 
+  FileText,
   X, 
   ChevronDown, 
   ChevronRight, 
@@ -41,12 +42,13 @@ export default function Sidebar({
   };
 
   const handleChapterClick = (book, page) => {
-    onSelectBook(book, page);
+    onSelectBook(book, page, 'pdf');
     onClose();
   };
 
-  const handleBookClick = (book) => {
-    onSelectBook(book);
+  const handleBookClick = (book, mode = 'pdf') => {
+    const page = allProgress[book.id]?.currentPage || 1;
+    onSelectBook(book, page, mode);
     onClose();
   };
 
@@ -231,21 +233,31 @@ export default function Sidebar({
                   </div>
 
                   {/* বইয়ের অ্যাকশন বাটনসমূহ */}
-                  <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between gap-2">
+                  <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between gap-1.5">
                     <button
-                      onClick={() => handleBookClick(book)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-library-primary text-white dark:bg-library-accent dark:text-library-primaryDark hover:opacity-90 transition shadow-2xs"
+                      onClick={() => handleBookClick(book, 'pdf')}
+                      className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-library-primary text-white dark:bg-library-accent dark:text-library-primaryDark hover:opacity-90 transition shadow-2xs"
+                      title="মূল PDF ভিউ"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
-                      <span>{percent > 0 ? `পৃষ্ঠা ${currentPage}-এ পড়ুন` : 'পড়ুন'}</span>
+                      <span>PDF</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleBookClick(book, 'text')}
+                      className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 transition shadow-2xs"
+                      title="মোবাইল টেক্সট রিডিং মোড"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>রিডিং মোড</span>
                     </button>
 
                     <button
                       onClick={() => toggleBookAccordion(book.id)}
-                      className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                      className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1.5 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-gray-800 transition ml-auto"
                       title="সূচিপত্র দেখুন বা লুকান"
                     >
-                      <span>সূচিপত্র ({filteredToc.length})</span>
+                      <span>সূচি</span>
                       {isExpanded ? (
                         <ChevronDown className="w-3.5 h-3.5 text-library-primary dark:text-library-accent" />
                       ) : (

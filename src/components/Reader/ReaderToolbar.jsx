@@ -89,36 +89,42 @@ export default function ReaderToolbar({
             </div>
           </div>
 
-          {/* ডান পাশ: অ্যাকশনস (সূচিপত্র, বুকমার্ক, সার্চ, মোড, থিম) */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* ডান পাশ: রিডিং মোড সুইচ, সার্চ, সূচিপত্র, বুকমার্ক, থিম */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* মোড সুইচ: PDF ⇋ টেক্সট */}
-            <button
-              onClick={onToggleMode}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition ${
-                mode === 'text'
-                  ? 'bg-library-accent text-library-primaryDark shadow-sm'
-                  : 'bg-library-primary/10 text-library-primary dark:bg-library-accent/15 dark:text-library-accent hover:bg-library-primary/20'
-              }`}
-              title={mode === 'pdf' ? 'টেক্সট মোডে পড়ুন' : 'মূল PDF ভিউয়ারে দেখুন'}
-            >
-              {mode === 'pdf' ? (
-                <>
-                  <FileText className="w-4 h-4" />
-                  <span className="hidden sm:inline">টেক্সট মোড</span>
-                </>
-              ) : (
-                <>
-                  <BookOpen className="w-4 h-4" />
-                  <span className="hidden sm:inline">মূল PDF</span>
-                </>
-              )}
-            </button>
+            {/* মোড সুইচ: মূল PDF ⇋ রিডিং মোড (উভয় ডিভাইসে অত্যন্ত সুস্পষ্ট ও আকর্ষণীয়) */}
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-0.5 rounded-xl border border-library-border dark:border-library-darkBorder shadow-2xs">
+              <button
+                onClick={() => mode !== 'pdf' && onToggleMode()}
+                className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                  mode === 'pdf'
+                    ? 'bg-white dark:bg-library-darkCard text-library-primary dark:text-library-accent shadow-xs'
+                    : 'text-library-textMuted hover:text-library-text'
+                }`}
+                title="মূল PDF পৃষ্ঠা দেখুন"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span className="text-[11px] sm:text-xs">PDF</span>
+              </button>
+              
+              <button
+                onClick={() => mode !== 'text' && onToggleMode()}
+                className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                  mode === 'text'
+                    ? 'bg-library-accent text-library-primaryDark shadow-xs'
+                    : 'text-library-textMuted hover:text-library-text'
+                }`}
+                title="টেক্সট রিডিং মোড (ফন্ট ও ব্যাকগ্রাউন্ড নিয়ন্ত্রণ)"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span className="text-[11px] sm:text-xs">রিডিং মোড</span>
+              </button>
+            </div>
 
             {/* সার্চ */}
             <button
               onClick={onOpenSearch}
-              className="p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition"
+              className="p-1.5 sm:p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition"
               title="বইয়ের ভেতরে খুঁজুন"
             >
               <Search className="w-4 h-4" />
@@ -127,7 +133,7 @@ export default function ReaderToolbar({
             {/* সূচিপত্র */}
             <button
               onClick={onOpenToc}
-              className="p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition"
+              className="p-1.5 sm:p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition"
               title="সূচিপত্র খুলুন"
             >
               <List className="w-4 h-4" />
@@ -136,7 +142,7 @@ export default function ReaderToolbar({
             {/* বুকমার্ক টগল */}
             <button
               onClick={onToggleBookmark}
-              className={`p-2 rounded-xl transition ${
+              className={`p-1.5 sm:p-2 rounded-xl transition ${
                 isBookmarked 
                   ? 'text-library-accent bg-library-accent/15' 
                   : 'text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder'
@@ -146,32 +152,36 @@ export default function ReaderToolbar({
               <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
             </button>
 
-            {/* বুকমার্ক লিস্ট */}
-            <button
-              onClick={onOpenBookmarks}
-              className="hidden sm:block p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition text-xs"
-              title="বুকমার্কের তালিকা"
-            >
-              বুকমার্ক
-            </button>
-
-            {/* থিম পরিবর্তন (Light / Sepia / Dark) */}
-            <button
-              onClick={() => {
-                const next = themeFilter === 'light' ? 'sepia' : themeFilter === 'sepia' ? 'dark' : 'light';
-                onThemeFilterChange(next);
-              }}
-              className="p-2 rounded-xl text-library-textMuted hover:text-library-text dark:hover:text-library-darkText hover:bg-gray-100 dark:hover:bg-library-darkBorder transition"
-              title="পঠন থিম পরিবর্তন (লাইট / সেপিয়া / নাইট)"
-            >
-              {themeFilter === 'dark' ? (
-                <Moon className="w-4 h-4 text-library-accent" />
-              ) : themeFilter === 'sepia' ? (
-                <span className="text-xs font-bold text-amber-700">সেপিয়া</span>
-              ) : (
-                <Sun className="w-4 h-4 text-amber-500" />
-              )}
-            </button>
+            {/* পঠন থিম নির্বাচন (Light / Sepia / Dark) */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-gray-100 dark:bg-gray-800">
+              <button
+                onClick={() => onThemeFilterChange('light')}
+                className={`w-6 h-6 rounded-md flex items-center justify-center transition ${
+                  themeFilter === 'light' ? 'ring-2 ring-library-primary bg-white text-library-primary shadow-xs' : 'opacity-60 hover:opacity-100'
+                }`}
+                title="লাইট মোড"
+              >
+                <Sun className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onThemeFilterChange('sepia')}
+                className={`w-6 h-6 rounded-md flex items-center justify-center transition bg-[#f4ecd8] text-[#5c4033] ${
+                  themeFilter === 'sepia' ? 'ring-2 ring-amber-600 font-bold shadow-xs' : 'opacity-60 hover:opacity-100'
+                }`}
+                title="সেপিয়া (আই-কেয়ার চোখ-বান্ধব মোড)"
+              >
+                <span className="text-[10px] font-bold">সে</span>
+              </button>
+              <button
+                onClick={() => onThemeFilterChange('dark')}
+                className={`w-6 h-6 rounded-md flex items-center justify-center transition bg-gray-900 text-yellow-300 ${
+                  themeFilter === 'dark' ? 'ring-2 ring-yellow-400 shadow-xs' : 'opacity-60 hover:opacity-100'
+                }`}
+                title="নাইট / ডার্ক মোড"
+              >
+                <Moon className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
             {/* ফুলস্ক্রিন */}
             <button
